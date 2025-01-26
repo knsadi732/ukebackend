@@ -1,33 +1,13 @@
-const User = require("../models/users");
+const WorkOrder = require("../models/workOrder");
 const { successResponse, errorResponse } = require("../helpers/apiHelper");
-const { single, multiple } = require("../helpers/fileUpload");
 
 exports.create = async (req, res) => {
   try {
-    const uploadKeys = [
-      "aadhar_front_image",
-      "aadhar_back_image",
-      "pan_image",
-      "certificate",
-      "upload_image",
-      "medical",
-      "eye_test_medical",
-      "driving_license",
-    ];
-
-    uploadKeys.forEach((key) => {
-      if (key === "certificate") {
-        multiple(req, key, "users");
-      } else {
-        single(req, key, "users");
-      }
-    });
-
-    const user = await new User({ ...req.body }).save();
+    const workOrder = await new WorkOrder({ ...req.body }).save();
     return successResponse({
       res,
       status: 201,
-      data: user,
+      data: workOrder,
       msg: "Record created successfully",
     });
   } catch (error) {
@@ -39,7 +19,7 @@ exports.create = async (req, res) => {
     });
   }
 };
-exports.getUsers = async (req, res) => {
+exports.getWorkOrders = async (req, res) => {
   const {
     page = 1,
     limit = 10,
@@ -50,7 +30,7 @@ exports.getUsers = async (req, res) => {
 
   const [field, value] = sortBy.split(",");
 
-  let query = { userType: "testing" };
+  let query = { workOrderType: "testing" };
 
   if (searchText)
     query = { ...query, name: { $regex: searchText, $options: "i" } };
@@ -58,7 +38,7 @@ exports.getUsers = async (req, res) => {
   if (status !== "") query = { ...query, status };
 
   try {
-    let users = await User.paginate(query, {
+    let workOrders = await WorkOrder.paginate(query, {
       page,
       limit,
       lean: true,
@@ -67,7 +47,7 @@ exports.getUsers = async (req, res) => {
 
     return successResponse({
       res,
-      data: users,
+      data: workOrders,
       msg: "Record found successfully",
     });
   } catch (error) {
@@ -80,7 +60,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.getUserById = async (req, res) => {
+exports.getWorkOrderById = async (req, res) => {
   const {
     status = "",
     searchText = "",
@@ -90,7 +70,7 @@ exports.getUserById = async (req, res) => {
 
   const [field, value] = sortBy.split(",");
 
-  let query = { userType: "testing" };
+  let query = { workOrderType: "testing" };
 
   // Add search and status filters if `id` is not provided
   if (!id) {
@@ -105,23 +85,27 @@ exports.getUserById = async (req, res) => {
 
   try {
     // Fetch a single document by ID or the first matching record
-    const user = id
-      ? await User.findOne({ _id: id, userType: "testing", lean: true }) // Fetch by ID
-      : await User.findOne(query)
+    const workOrder = id
+      ? await WorkOrder.findOne({
+          _id: id,
+          workOrderType: "testing",
+          lean: true,
+        }) // Fetch by ID
+      : await WorkOrder.findOne(query)
           .sort({ [field]: parseInt(value) })
           .lean();
 
-    if (!user) {
+    if (!workOrder) {
       return errorResponse({
         res,
         status: 404,
-        msg: "User not found",
+        msg: "WorkOrder not found",
       });
     }
 
     return successResponse({
       res,
-      data: user,
+      data: workOrder,
       msg: "Record found successfully",
     });
   } catch (error) {
@@ -133,30 +117,12 @@ exports.getUserById = async (req, res) => {
     });
   }
 };
-exports.UpdateUserById = async (req, res) => {
+exports.UpdateWorkOrderById = async (req, res) => {
   const { id } = req.params; // Extract `id` from URL parameters
   const updates = req.body; // Extract updates from request body
 
   try {
-       const uploadKeys = [
-         "aadhar_front_image",
-         "aadhar_back_image",
-         "pan_image",
-         "certificate",
-         "upload_image",
-         "medical",
-         "eye_test_medical",
-         "driving_license",
-       ];
-
-       uploadKeys.forEach((key) => {
-         if (key === "certificate") {
-           multiple(req, key, "users");
-         } else {
-           single(req, key, "users");
-         }
-       });
-    console.log({id})
+    console.log({ id });
     if (!id) {
       return errorResponse({
         res,
@@ -166,75 +132,72 @@ exports.UpdateUserById = async (req, res) => {
     }
 
     // Find and update the user
-    const updatedUser = await User.findByIdAndUpdate(
+    const updatedWorkOrder = await WorkOrder.findByIdAndUpdate(
       id, // Use the `id` to find the user
       { $set: updates }, // Apply updates
       { new: true, lean: true } // Return the updated document
     );
 
-    if (!updatedUser) {
+    if (!updatedWorkOrder) {
       // Log additional information for debugging
-      console.error(`User with ID ${id} not found.`);
+      console.error(`WorkOrder with ID ${id} not found.`);
       return errorResponse({
         res,
         status: 404,
-        msg: "User not found",
+        msg: "WorkOrder not found",
       });
     }
 
     return successResponse({
       res,
-      data: updatedUser,
-      msg: "User updated successfully",
+      data: updatedWorkOrder,
+      msg: "WorkOrder updated successfully",
     });
   } catch (error) {
     // Handle and log any error
-    console.error("Error updating user:", error);
+    console.error("Error updating workOrder:", error);
     return errorResponse({
       res,
       error,
       status: 400,
-      msg: "Failed to update user",
+      msg: "Failed to update workOrder",
     });
   }
 };
 
-exports.deleteUserById = async (req, res) => {
-  const { id } = req.body; 
+exports.deleteWorkOrderById = async (req, res) => {
+  const { id } = req.body;
 
   if (!id) {
     return errorResponse({
       res,
       status: 400,
-      msg: "User ID is required",
+      msg: "WorkOrder ID is required",
     });
   }
 
   try {
-    const deletedUser = await User.findByIdAndDelete(id);
+    const deletedWorkOrder = await WorkOrder.findByIdAndDelete(id);
 
-    if (!deletedUser) {
+    if (!deletedWorkOrder) {
       return errorResponse({
         res,
         status: 404,
-        msg: "User not found",
+        msg: "WorkOrder not found",
       });
     }
 
     return successResponse({
       res,
-      data: deletedUser,
-      msg: "User deleted successfully",
+      //   data: deletedWorkOrder,
+      msg: "WorkOrder deleted successfully",
     });
   } catch (error) {
     return errorResponse({
       res,
       error,
       status: 400,
-      msg: "Failed to delete user",
+      msg: "Failed to delete workOrder",
     });
   }
 };
-
-
-

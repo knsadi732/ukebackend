@@ -2,17 +2,17 @@ const app = require("express")();
 
 const {
   create,
-  getSites,
-  getSiteById,
-  UpdateSiteById,
-  deleteSiteById,
-} = require("../controllers/siteController");
+  getWorkOrders,
+  getWorkOrderById,
+  UpdateWorkOrderById,
+  deleteWorkOrderById,
+} = require("../controllers/WorkOrderController");
 
 
 app.post("/create", create);
-app.post("/get-sites", getSites);
-app.post("/get-site-by-id", getSiteById);
-app.post("/update-site-by-id/:id", UpdateSiteById);
-app.post("/delete-site-by-id", deleteSiteById);
+app.post("/get-Work_orders", getWorkOrders);
+app.post("/get-Work_order-by-id", getWorkOrderById);
+app.post("/update-Work_order-by-id/:id", UpdateWorkOrderById);
+app.post("/delete-Work_order-by-id", deleteWorkOrderById);
 
 module.exports = app;
