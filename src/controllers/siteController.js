@@ -60,13 +60,66 @@ exports.getSites = async (req, res) => {
   }
 };
 
+// exports.getSiteById = async (req, res) => {
+//   const {
+//     status = "",
+//     searchText = "",
+//     id = "", // Extract `id` from query parameters
+//     sortBy = "updatedAt,-1",
+//   } = req.query;
+
+
+//   const [field, value] = sortBy.split(",");
+
+//   let query = { siteType: "testing" };
+
+//   // Add search and status filters if `id` is not provided
+//   if (!id) {
+//     if (searchText) {
+//       query = { ...query, name: { $regex: searchText, $options: "i" } };
+//     }
+
+//     if (status !== "") {
+//       query = { ...query, status };
+//     }
+//   }
+
+//   try {
+//     // Fetch a single document by ID or the first matching record
+  
+//     const site = id
+//       ? await Site.findOne({ _id: id, siteType: "testing", lean: true }) // Fetch by ID
+//       : await Site.findOne(query)
+//           .sort({ [field]: parseInt(value) })
+//           .lean();
+//     if (!site) {
+//       return errorResponse({
+//         res,
+//         status: 404,
+//         msg: "Site not found",
+//       });
+//     }
+
+//     return successResponse({
+//       res,
+//       data: site,
+//       msg: "Record found successfully",
+//     });
+//   } catch (error) {
+//     return errorResponse({
+//       res,
+//       error,
+//       status: 400,
+//       msg: "Invalid data",
+//     });
+//   }
+// };
+
 exports.getSiteById = async (req, res) => {
-  const {
-    status = "",
-    searchText = "",
-    id = "", // Extract `id` from query parameters
-    sortBy = "updatedAt,-1",
-  } = req.query;
+  const { status = "", searchText = "", sortBy = "updatedAt,-1" } = req.query;
+
+  const { id = "" } = req.body; // Extract `id` from the request body
+
 
   const [field, value] = sortBy.split(",");
 
@@ -86,10 +139,12 @@ exports.getSiteById = async (req, res) => {
   try {
     // Fetch a single document by ID or the first matching record
     const site = id
-      ? await Site.findOne({ _id: id, siteType: "testing", lean: true }) // Fetch by ID
+      ? await Site.findOne({ _id: id, siteType: "testing" }) // Fetch by ID
       : await Site.findOne(query)
           .sort({ [field]: parseInt(value) })
           .lean();
+
+
 
     if (!site) {
       return errorResponse({
@@ -105,6 +160,7 @@ exports.getSiteById = async (req, res) => {
       msg: "Record found successfully",
     });
   } catch (error) {
+    console.error("Error Details:", error);
     return errorResponse({
       res,
       error,
@@ -113,12 +169,13 @@ exports.getSiteById = async (req, res) => {
     });
   }
 };
+
+
 exports.UpdateSiteById = async (req, res) => {
   const { id } = req.params; // Extract `id` from URL parameters
   const updates = req.body; // Extract updates from request body
 
   try {
-    console.log({ id });
     if (!id) {
       return errorResponse({
         res,
@@ -135,8 +192,6 @@ exports.UpdateSiteById = async (req, res) => {
     );
 
     if (!updatedSite) {
-      // Log additional information for debugging
-      console.error(`Site with ID ${id} not found.`);
       return errorResponse({
         res,
         status: 404,

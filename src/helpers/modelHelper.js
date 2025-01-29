@@ -8,9 +8,10 @@ exports.encryptPassword = (password) => {
   return hash;
 };
 
-exports.createToken = (email) => {
-  return jwt.sign({ email }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "24h",
+exports.createToken = (phone) => {
+  console.log("process.env.JWT_SECRET_KEY",process.env.JWT_SECRET_KEY);
+  return jwt.sign({ phone }, process.env.JWT_SECRET_KEY, {
+    expiresIn: "8h",
   });
 };
 

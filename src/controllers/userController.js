@@ -81,12 +81,8 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.getUserById = async (req, res) => {
-  const {
-    status = "",
-    searchText = "",
-    id = "", // Extract `id` from query parameters
-    sortBy = "updatedAt,-1",
-  } = req.query;
+  const { status = "", searchText = "", sortBy = "updatedAt,-1" } = req.query;
+  const { id = "" } = req.body;
 
   const [field, value] = sortBy.split(",");
 
@@ -105,12 +101,12 @@ exports.getUserById = async (req, res) => {
 
   try {
     // Fetch a single document by ID or the first matching record
+
     const user = id
-      ? await User.findOne({ _id: id, userType: "testing", lean: true }) // Fetch by ID
+      ? await User.findOne({ _id: id, userType: "testing" }) // Fetch by ID
       : await User.findOne(query)
           .sort({ [field]: parseInt(value) })
           .lean();
-
     if (!user) {
       return errorResponse({
         res,
@@ -118,6 +114,8 @@ exports.getUserById = async (req, res) => {
         msg: "User not found",
       });
     }
+
+    console.log({user})
 
     return successResponse({
       res,
@@ -137,26 +135,28 @@ exports.UpdateUserById = async (req, res) => {
   const { id } = req.params; // Extract `id` from URL parameters
   const updates = req.body; // Extract updates from request body
 
-  try {
-       const uploadKeys = [
-         "aadhar_front_image",
-         "aadhar_back_image",
-         "pan_image",
-         "certificate",
-         "upload_image",
-         "medical",
-         "eye_test_medical",
-         "driving_license",
-       ];
+  console.log({ req });
 
-       uploadKeys.forEach((key) => {
-         if (key === "certificate") {
-           multiple(req, key, "users");
-         } else {
-           single(req, key, "users");
-         }
-       });
-    console.log({id})
+  try {
+    const uploadKeys = [
+      "aadhar_front_image",
+      "aadhar_back_image",
+      "pan_image",
+      "certificate",
+      "upload_image",
+      "medical",
+      "eye_test_medical",
+      "driving_license",
+    ];
+
+    uploadKeys.forEach((key) => {
+      if (key === "certificate") {
+        multiple(req, key, "users");
+      } else {
+        single(req, key, "users");
+      }
+    });
+    console.log({ id });
     if (!id) {
       return errorResponse({
         res,
@@ -200,7 +200,7 @@ exports.UpdateUserById = async (req, res) => {
 };
 
 exports.deleteUserById = async (req, res) => {
-  const { id } = req.body; 
+  const { id } = req.body;
 
   if (!id) {
     return errorResponse({
@@ -235,6 +235,3 @@ exports.deleteUserById = async (req, res) => {
     });
   }
 };
-
-
-

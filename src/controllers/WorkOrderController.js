@@ -21,29 +21,41 @@ exports.create = async (req, res) => {
 };
 exports.getWorkOrders = async (req, res) => {
   const {
-    page = 1,
-    limit = 10,
     status = "",
     searchText = "",
     sortBy = "updatedAt,-1",
+    workOrderType = "",
   } = req.query;
 
-  const [field, value] = sortBy.split(",");
+  const { site_id } = req.body; // Extract site_id from request body
 
-  let query = { workOrderType: "testing" };
+  // Parse sorting parameters
+  const sortOptions = sortBy.split(",");
+  let sortField = "updatedAt"; // Default field
+  let sortValue = -1; // Default order (descending)
 
-  if (searchText)
-    query = { ...query, name: { $regex: searchText, $options: "i" } };
+  if (sortOptions.length === 2) {
+    sortField = sortOptions[0];
+    sortValue = parseInt(sortOptions[1]) || -1;
+  }
 
-  if (status !== "") query = { ...query, status };
+  // Build query
+  let query = {};
+  if (workOrderType) query.workOrderType = workOrderType;
+  if (status !== "") query.status = status;
+  if (site_id) query.site_id = site_id; // ✅ No more "site_id is not defined" error
+  if (searchText) {
+    query.$or = [
+      { wo_no: { $regex: searchText, $options: "i" } },
+      { wo_name: { $regex: searchText, $options: "i" } },
+      { site_name: { $regex: searchText, $options: "i" } },
+    ];
+  }
 
   try {
-    let workOrders = await WorkOrder.paginate(query, {
-      page,
-      limit,
-      lean: true,
-      sort: { [field]: parseInt(value) },
-    });
+    let workOrders = await WorkOrder.find(query)
+      .sort({ [sortField]: sortValue })
+      .lean();
 
     return successResponse({
       res,
@@ -61,13 +73,9 @@ exports.getWorkOrders = async (req, res) => {
 };
 
 exports.getWorkOrderById = async (req, res) => {
-  const {
-    status = "",
-    searchText = "",
-    id = "", // Extract `id` from query parameters
-    sortBy = "updatedAt,-1",
-  } = req.query;
+  const { status = "", searchText = "", sortBy = "updatedAt,-1" } = req.query;
 
+  const { id } = req?.body;
   const [field, value] = sortBy.split(",");
 
   let query = { workOrderType: "testing" };
@@ -84,17 +92,18 @@ exports.getWorkOrderById = async (req, res) => {
   }
 
   try {
+    console.log("iddddd", { id });
     // Fetch a single document by ID or the first matching record
     const workOrder = id
       ? await WorkOrder.findOne({
           _id: id,
-          workOrderType: "testing",
-          lean: true,
+          // workOrderType: "testing",
+          // lean: true,
         }) // Fetch by ID
       : await WorkOrder.findOne(query)
           .sort({ [field]: parseInt(value) })
-          .lean();
-
+          // .lean();
+    console.log({ workOrder });
     if (!workOrder) {
       return errorResponse({
         res,
@@ -122,7 +131,6 @@ exports.UpdateWorkOrderById = async (req, res) => {
   const updates = req.body; // Extract updates from request body
 
   try {
-    console.log({ id });
     if (!id) {
       return errorResponse({
         res,

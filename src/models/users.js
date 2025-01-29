@@ -141,6 +141,8 @@ const schema = new mongoose.Schema(
     medical: { type: String, required: true, trim: true },
     eye_test_medical: { type: String, trim: true },
     role: { type: String, required: true, trim: true },
+    wo_id: { type: String, required: true, trim: true },
+    site_id: { type: String, required: true, trim: true },
 
     driving_license_image: {
       type: String,

@@ -14,8 +14,8 @@ exports.auth = async (req, res, next) => {
   token = token ? token.replace("Bearer ", "") : "";
 
   try {
-    const { email } = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const user = await User.findOne({ email });
+    const { phone } = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const user = await User.findOne({ phone });
     req.authUser = user;
 
     return next();

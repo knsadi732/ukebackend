@@ -68,10 +68,11 @@ exports.getRolesById = async (req, res) => {
   const {
     status = "",
     searchText = "",
-    id = "", // Extract `id` from query parameters
     sortBy = "updatedAt,-1",
   } = req.query;
 
+
+  const { id = "" } = req.body;
   const [field, value] = sortBy.split(",");
 
   let query = { roleType: "testing" };
