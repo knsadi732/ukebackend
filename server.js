@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const cors = require("cors");
 const path = require("path");
 const express = require("express");
@@ -13,7 +14,24 @@ const app = express();
 
 
 // Middleware setup
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// Handle Preflight Requests
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.sendStatus(200);
+});
 app.use(express.json());
 
 // File upload middleware
@@ -40,6 +58,19 @@ require("./src/config/connection");
 // Route setup
 const rootRouter = require("./src/routes");
 app.use("/api", rootRouter);
+
+app.get("/api/ifsc/:code", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `https://ifsc.razorpay.com/${req.params.code}`
+    );
+    res.json(response.data);
+  } catch (error) {
+    res
+      .status(error.response?.status || 500)
+      .json({ error: "Invalid IFSC Code or API Error" });
+  }
+});
 
 // Default route
 app.get("/", (req, res) => {

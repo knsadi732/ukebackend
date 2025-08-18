@@ -1,6 +1,29 @@
 const WorkOrder = require("../models/workOrder");
 const { successResponse, errorResponse } = require("../helpers/apiHelper");
 
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const xlsx = require("xlsx");
+const uploadDir = "uploads";
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `excelFile-${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
+
+const upload = multer({ storage }).single("excelFile");
+
+
 exports.create = async (req, res) => {
   try {
     const workOrder = await new WorkOrder({ ...req.body }).save();
@@ -92,7 +115,6 @@ exports.getWorkOrderById = async (req, res) => {
   }
 
   try {
-    console.log("iddddd", { id });
     // Fetch a single document by ID or the first matching record
     const workOrder = id
       ? await WorkOrder.findOne({
@@ -103,7 +125,6 @@ exports.getWorkOrderById = async (req, res) => {
       : await WorkOrder.findOne(query)
           .sort({ [field]: parseInt(value) })
           // .lean();
-    console.log({ workOrder });
     if (!workOrder) {
       return errorResponse({
         res,
@@ -126,6 +147,96 @@ exports.getWorkOrderById = async (req, res) => {
     });
   }
 };
+
+
+exports.UploadDPR = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return errorResponse({
+        res,
+        status: 500,
+        msg: "File upload failed",
+        error: err.message,
+      });
+    }
+
+    if (!req.file) {
+      return errorResponse({
+        res,
+        status: 400,
+        msg: "No file uploaded!",
+      });
+    }
+
+    const filePath = req.file.path;
+
+    try {
+      // Read the uploaded Excel file
+      const workbook = xlsx.readFile(filePath);
+      const sheetName = workbook.SheetNames[0]; // Read first sheet
+      const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+      if (!jsonData.length) {
+        return errorResponse({
+          res,
+          status: 400,
+          msg: "Excel file is empty or improperly formatted",
+        });
+      }
+
+      // Expected Headers (case insensitive)
+      const expectedHeaders = [
+        "SL NO",
+        "JOB DESCRIPTION",
+        "SERVICE CODE",
+        "QTY",
+        "UOM",
+        "TENDER UNIT RATE(Rs)",
+        "TENDER TOTAL AMOUNT(Rs)",
+      ];
+
+      // Normalize headers from the file (convert to lowercase for comparison)
+      const fileHeaders = Object.keys(jsonData[0]).map((header) =>
+        header.toLowerCase()
+      );
+
+      // Check for missing headers
+      const missingHeaders = expectedHeaders.filter(
+        (header) => !fileHeaders.includes(header.toLowerCase())
+      );
+
+      if (missingHeaders.length > 0) {
+        return errorResponse({
+          res,
+          status: 400,
+          msg: `Missing headers: ${missingHeaders.join(", ")}`,
+        });
+      }
+
+      // Cleanup uploaded file after processing
+      fs.unlinkSync(filePath);
+
+      return successResponse({
+        res,
+        data: jsonData,
+        msg: "File uploaded and processed successfully!",
+      });
+    } catch (error) {
+      // Cleanup file in case of error
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      return errorResponse({
+        res,
+        error,
+        status: 500,
+        msg: "Error processing file",
+      });
+    }
+  });
+};
+
 exports.UpdateWorkOrderById = async (req, res) => {
   const { id } = req.params; // Extract `id` from URL parameters
   const updates = req.body; // Extract updates from request body

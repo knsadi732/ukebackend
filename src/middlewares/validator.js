@@ -3,7 +3,6 @@ const { validationResult } = require("");
 const { errorResponse } = require("../helpers/apiHelper");
 
 exports.validateError = (req, res, next) => {
-  console.log({ req }, "middle were", req.body);
   const { errors } = validationResult(req);
 
   if (errors && errors.length > 0)

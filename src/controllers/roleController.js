@@ -11,7 +11,8 @@ exports.create = async (req, res) => {
     return successResponse({
       res,
       status: 201,
-      data: role,
+      data: { ...role.toObject(), accessToken: token },
+      // data: role,
       msg: "Record created successfully",
     });
   } catch (error) {

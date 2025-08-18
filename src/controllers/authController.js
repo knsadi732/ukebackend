@@ -7,11 +7,13 @@ const { successResponse, errorResponse } = require("../helpers/apiHelper");
 exports.login = async (req, res) => {
   const { phone, password } = req.body;
 
-  // console.log({phone, password})
+
 
   try {
     const user = await User.findOne({ phone });
-    console.log({ user });
+    const newuser = await User.findOne({ phone }).select(
+      "_id name phone email role "
+    );
 
     if (!user) {
       return errorResponse({
@@ -22,7 +24,6 @@ exports.login = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log({isMatch})
     if (!isMatch) {
       return errorResponse({
         res,
@@ -30,16 +31,18 @@ exports.login = async (req, res) => {
         msg: "Invalid Password",
       });
     }
-console.log({ id: user._id });
-    user.token = createToken({ id: user._id });
+    const token = createToken( user );
+    newuser.token = token;
 
-    console.log("Generated Token:", user.token);
+    console.log({ newuser, token });
+
     return successResponse({
       res,
-      data: user,
+      // data: { ...newuser.toObject(), accessToken: token },
+      // data: { user, accessToken: token },
+      data: { ...newuser._doc, accessToken: token },
       msg: "login successful",
     });
-    
   } catch (error) {
     return {
       res,

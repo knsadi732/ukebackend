@@ -64,6 +64,7 @@ exports.getUsers = async (req, res) => {
       lean: true,
       sort: { [field]: parseInt(value) },
     });
+    console.log({users})
 
     return successResponse({
       res,
@@ -115,8 +116,6 @@ exports.getUserById = async (req, res) => {
       });
     }
 
-    console.log({user})
-
     return successResponse({
       res,
       data: user,
@@ -134,8 +133,6 @@ exports.getUserById = async (req, res) => {
 exports.UpdateUserById = async (req, res) => {
   const { id } = req.params; // Extract `id` from URL parameters
   const updates = req.body; // Extract updates from request body
-
-  console.log({ req });
 
   try {
     const uploadKeys = [
@@ -156,7 +153,6 @@ exports.UpdateUserById = async (req, res) => {
         single(req, key, "users");
       }
     });
-    console.log({ id });
     if (!id) {
       return errorResponse({
         res,

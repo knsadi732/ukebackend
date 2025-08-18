@@ -44,7 +44,7 @@ exports.getSites = async (req, res) => {
       lean: true,
       sort: { [field]: parseInt(value) },
     });
-
+    console.log({ sites });
     return successResponse({
       res,
       data: sites,
@@ -60,66 +60,10 @@ exports.getSites = async (req, res) => {
   }
 };
 
-// exports.getSiteById = async (req, res) => {
-//   const {
-//     status = "",
-//     searchText = "",
-//     id = "", // Extract `id` from query parameters
-//     sortBy = "updatedAt,-1",
-//   } = req.query;
-
-
-//   const [field, value] = sortBy.split(",");
-
-//   let query = { siteType: "testing" };
-
-//   // Add search and status filters if `id` is not provided
-//   if (!id) {
-//     if (searchText) {
-//       query = { ...query, name: { $regex: searchText, $options: "i" } };
-//     }
-
-//     if (status !== "") {
-//       query = { ...query, status };
-//     }
-//   }
-
-//   try {
-//     // Fetch a single document by ID or the first matching record
-  
-//     const site = id
-//       ? await Site.findOne({ _id: id, siteType: "testing", lean: true }) // Fetch by ID
-//       : await Site.findOne(query)
-//           .sort({ [field]: parseInt(value) })
-//           .lean();
-//     if (!site) {
-//       return errorResponse({
-//         res,
-//         status: 404,
-//         msg: "Site not found",
-//       });
-//     }
-
-//     return successResponse({
-//       res,
-//       data: site,
-//       msg: "Record found successfully",
-//     });
-//   } catch (error) {
-//     return errorResponse({
-//       res,
-//       error,
-//       status: 400,
-//       msg: "Invalid data",
-//     });
-//   }
-// };
-
 exports.getSiteById = async (req, res) => {
   const { status = "", searchText = "", sortBy = "updatedAt,-1" } = req.query;
 
   const { id = "" } = req.body; // Extract `id` from the request body
-
 
   const [field, value] = sortBy.split(",");
 
@@ -144,8 +88,6 @@ exports.getSiteById = async (req, res) => {
           .sort({ [field]: parseInt(value) })
           .lean();
 
-
-
     if (!site) {
       return errorResponse({
         res,
@@ -169,7 +111,6 @@ exports.getSiteById = async (req, res) => {
     });
   }
 };
-
 
 exports.UpdateSiteById = async (req, res) => {
   const { id } = req.params; // Extract `id` from URL parameters
@@ -240,7 +181,7 @@ exports.deleteSiteById = async (req, res) => {
 
     return successResponse({
       res,
-    //   data: deletedSite,
+      //   data: deletedSite,
       msg: "Site deleted successfully",
     });
   } catch (error) {
