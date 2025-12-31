@@ -13,6 +13,7 @@ ukebackend/
 │   ├── config/
 │   │   └── connection.js      # Database connection setup
 │   ├── controllers/           # Business logic for API endpoints
+│   │   ├── authController.js
 │   │   ├── roleController.js
 │   │   ├── siteController.js
 │   │   └── userController.js
@@ -27,6 +28,7 @@ ukebackend/
 │   │   └── users.js
 │   └── routes/                # API Route definitions
 │       ├── index.js           # Main router aggregating all routes
+│       ├── authRoute.js
 │       ├── roleRoute.js
 │       ├── siteRoute.js
 │       └── userRoute.js
@@ -62,6 +64,9 @@ ukebackend/
 - **Delete**: Removes sites.
 
 ## API Endpoints
+
+### Auth Routes
+- `POST /api/auth/login`
 
 ### User Routes
 - `POST /api/user/create`
