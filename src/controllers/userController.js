@@ -4,11 +4,12 @@ const { single, multiple } = require("../helpers/fileUpload");
 
 exports.create = async (req, res) => {
   try {
+    console.log("Create User API hit. Request Body:", req.body);
     const uploadKeys = [
       "aadhar_front_image",
       "aadhar_back_image",
       "pan_image",
-      "certificate",
+      "certificate",  
       "upload_image",
       "medical",
       "eye_test_medical",
@@ -24,6 +25,7 @@ exports.create = async (req, res) => {
     });
 
     const user = await new User({ ...req.body }).save();
+    console.log({ user });
     return successResponse({
       res,
       status: 201,
@@ -31,6 +33,7 @@ exports.create = async (req, res) => {
       msg: "Record created successfully",
     });
   } catch (error) {
+    console.log("Error in create user:", error);
     return errorResponse({
       res,
       error,
@@ -217,6 +220,3 @@ exports.deleteUserById = async (req, res) => {
     });
   }
 };
-
-
-
