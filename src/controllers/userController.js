@@ -50,7 +50,7 @@ exports.getUsers = async (req, res) => {
 
   const [field, value] = sortBy.split(",");
 
-  let query = { userType: "testing" };
+  let query = {}; // Allow fetching all users
 
   if (searchText)
     query = { ...query, name: { $regex: searchText, $options: "i" } };
@@ -90,7 +90,7 @@ exports.getUserById = async (req, res) => {
 
   const [field, value] = sortBy.split(",");
 
-  let query = { userType: "testing" };
+  let query = {}; // Allow fetching any user by ID
 
   // Add search and status filters if `id` is not provided
   if (!id) {
@@ -106,7 +106,7 @@ exports.getUserById = async (req, res) => {
   try {
     // Fetch a single document by ID or the first matching record
     const user = id
-      ? await User.findOne({ _id: id, userType: "testing", lean: true }) // Fetch by ID
+      ? await User.findOne({ _id: id }).lean() // Fetch by ID without userType filter
       : await User.findOne(query)
           .sort({ [field]: parseInt(value) })
           .lean();

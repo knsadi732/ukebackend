@@ -26,11 +26,14 @@ exports.getSites = async (req, res) => {
     status = "",
     searchText = "",
     sortBy = "updatedAt,-1",
+    siteType = "",
   } = req.query;
 
   const [field, value] = sortBy.split(",");
 
-  let query = { siteType: "testing" };
+  let query = {};
+
+  if (siteType !== "") query = { ...query, siteType };
 
   if (searchText)
     query = { ...query, name: { $regex: searchText, $options: "i" } };
@@ -66,11 +69,14 @@ exports.getSiteById = async (req, res) => {
     searchText = "",
     id = "", // Extract `id` from query parameters
     sortBy = "updatedAt,-1",
+    siteType = "",
   } = req.query;
 
   const [field, value] = sortBy.split(",");
 
-  let query = { siteType: "testing" };
+  let query = {};
+
+  if (siteType !== "") query = { ...query, siteType };
 
   // Add search and status filters if `id` is not provided
   if (!id) {
@@ -86,7 +92,7 @@ exports.getSiteById = async (req, res) => {
   try {
     // Fetch a single document by ID or the first matching record
     const site = id
-      ? await Site.findOne({ _id: id, siteType: "testing", lean: true }) // Fetch by ID
+      ? await Site.findOne({ _id: id, ...(siteType && { siteType }), lean: true }) // Fetch by ID, optionally filtering by siteType
       : await Site.findOne(query)
           .sort({ [field]: parseInt(value) })
           .lean();

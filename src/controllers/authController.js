@@ -63,8 +63,40 @@ exports.register = async (req, res) => {
       });
     }
 
+    // Process uploaded files
+    const fileFields = [
+      'aadhar_front_image',
+      'aadhar_back_image', 
+      'pan_image',
+      'upload_image',
+      'medical',
+      'eye_test_medical',
+      'driving_license_image'
+    ];
+    
+    const processedFiles = {};
+    
+    // Handle single file fields
+    fileFields.forEach(field => {
+      if (req.files && req.files[field] && req.files[field][0]) {
+        // Fix the path to be relative to the uploads directory
+        processedFiles[field] = req.files[field][0].path.replace('public\\\\', '');
+      }
+    });
+    
+    // Handle certificate array
+    if (req.files && req.files['certificate']) {
+      processedFiles['certificate'] = req.files['certificate'].map(file => file.path.replace('public\\\\', ''));
+    }
+
+    // Merge req.body with processed file paths
+    const userData = {
+      ...req.body,
+      ...processedFiles
+    };
+
     // Create new user
-    const user = await new User({ ...req.body }).save();
+    const user = await new User(userData).save();
 
     // Create token
     const token = createToken(user.email);
@@ -80,11 +112,12 @@ exports.register = async (req, res) => {
       msg: "User registered successfully",
     });
   } catch (error) {
+    console.error("Registration error:", error); // Log the full error for debugging
     return errorResponse({
       res,
       error,
-      status: 400,
-      msg: "Invalid data",
+      status: 500,
+      msg: "Internal server error",
     });
   }
 };

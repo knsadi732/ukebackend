@@ -30,10 +30,13 @@ exports.getRoles = async (req, res) => {
     status = "",
     searchText = "",
     sortBy = "updatedAt,-1",
+    roleType = "",
   } = req.query;
   const [field, value] = sortBy.split(",");
 
-  let query = { roleType: "testing" };
+  let query = {};
+
+  if (roleType !== "") query = { ...query, roleType };
 
   if (searchText)
     query = { ...query, name: { $regex: searchText, $options: "i" } };
@@ -70,11 +73,14 @@ exports.getRolesById = async (req, res) => {
     searchText = "",
     id = "", // Extract `id` from query parameters
     sortBy = "updatedAt,-1",
+    roleType = "",
   } = req.query;
 
   const [field, value] = sortBy.split(",");
 
-  let query = { roleType: "testing" };
+  let query = {};
+
+  if (roleType !== "") query = { ...query, roleType };
 
   // Add search and status filters if `id` is not provided
   if (!id) {
@@ -90,7 +96,7 @@ exports.getRolesById = async (req, res) => {
   try {
     // Fetch a single document by ID or the first matching record
     const role = id
-      ? await Role.findOne({ _id: id, roleType: "testing" }) // Fetch by ID
+      ? await Role.findOne({ _id: id, ...(roleType && { roleType }) }) // Fetch by ID, optionally filtering by roleType
       : await Role.findOne(query).sort({ [field]: parseInt(value) }); // Fetch first matching record
 
     if (!role) {
@@ -112,6 +118,43 @@ exports.getRolesById = async (req, res) => {
       error,
       status: 400,
       msg: "Invalid data",
+    });
+  }
+};
+
+exports.getAllRoles = async (req, res) => {
+  const {
+    status = "",
+    searchText = "",
+    sortBy = "updatedAt,-1",
+    roleType = "",
+  } = req.query;
+
+  const [field, value] = sortBy.split(",");
+
+  let query = {};
+
+  if (roleType !== "") query = { ...query, roleType };
+
+  if (searchText)
+    query = { ...query, name: { $regex: searchText, $options: "i" } };
+
+  if (status !== "") query = { ...query, status };
+
+  try {
+    let roles = await Role.find(query).sort({ [field]: parseInt(value) });
+
+    return successResponse({
+      res,
+      data: roles,
+      msg: "All roles found successfully",
+    });
+  } catch (error) {
+    return errorResponse({
+      res,
+      error,
+      status: 400,
+      msg: "Failed to get all roles",
     });
   }
 };

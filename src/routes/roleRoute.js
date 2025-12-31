@@ -4,11 +4,13 @@ const {
   create,
   getRoles,
   getRolesById,
+  getAllRoles,
   deleteRoleById,
 } = require("../controllers/roleController");
 
 app.post("/create", create);
-app.post("/get-roles", getRoles);
+app.get("/get-roles", getRoles);
+app.get("/get-all-roles", getAllRoles);
 app.post("/get-roles-by-id", getRolesById);
 app.post("/delete-roles-by-id", deleteRoleById);
 

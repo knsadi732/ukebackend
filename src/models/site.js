@@ -32,6 +32,6 @@ const schema = new mongoose.Schema(
   }
 ).plugin(mongoosePaginate);
 
-const model = mongoose.model("site", schema);
+const model = mongoose.model("Site", schema); // Changed from "site" to "Site"
 
 module.exports = model;

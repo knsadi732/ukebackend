@@ -88,6 +88,24 @@ const dprSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // New field to reference job items and track daily progress
+    jobDetails: [
+      {
+        jobItem: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "WorkOrderJobItem",
+          required: true,
+        },
+        quantityDone: {
+          type: Number,
+          required: true,
+        },
+        // You can add other daily-specific fields here, like shift, time, etc.
+        // shift: { type: String },
+        // startTime: { type: Date },
+        // endTime: { type: Date },
+      },
+    ],
   },
   {
     timestamps: true,

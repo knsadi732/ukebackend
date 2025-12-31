@@ -4,7 +4,9 @@ const {
   getWorkOrders, 
   getWorkOrderById, 
   updateWorkOrder, 
-  deleteWorkOrder 
+  deleteWorkOrder,
+  uploadJobList,
+  getJobListByWorkOrderId
 } = require("../controllers/workOrderController");
 const { auth } = require("../middlewares/auth");
 
@@ -16,5 +18,9 @@ router.get("/", getWorkOrders);
 router.get("/:id", getWorkOrderById);
 router.put("/:id", updateWorkOrder);
 router.delete("/:id", deleteWorkOrder);
+
+// New routes for job list management
+router.post("/:workOrderId/upload-job-list", uploadJobList);
+router.get("/:workOrderId/job-list", getJobListByWorkOrderId);
 
 module.exports = router;
