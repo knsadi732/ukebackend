@@ -1,6 +1,7 @@
 const User = require("../models/users");
 const { successResponse, errorResponse } = require("../helpers/apiHelper");
 const { single, multiple } = require("../helpers/fileUpload");
+const bcrypt = require("bcryptjs");
 
 exports.create = async (req, res) => {
   try {
@@ -9,7 +10,7 @@ exports.create = async (req, res) => {
       "aadhar_front_image",
       "aadhar_back_image",
       "pan_image",
-      "certificate",  
+      "certificate",
       "upload_image",
       "medical",
       "eye_test_medical",
@@ -111,8 +112,8 @@ exports.getUserById = async (req, res) => {
     const user = id
       ? await User.findOne({ _id: id, userType: "testing", lean: true }) // Fetch by ID
       : await User.findOne(query)
-          .sort({ [field]: parseInt(value) })
-          .lean();
+        .sort({ [field]: parseInt(value) })
+        .lean();
 
     if (!user) {
       return errorResponse({
@@ -141,13 +142,18 @@ exports.UpdateUserById = async (req, res) => {
   const updates = req.body; // Extract updates from request body
 
   try {
-    console.log({id})
+    console.log({ id })
     if (!id) {
       return errorResponse({
         res,
         status: 400,
         msg: "ID is required",
       });
+    }
+
+    if (updates.password) {
+      const salt = await bcrypt.genSalt(10);
+      updates.password = await bcrypt.hash(updates.password, salt);
     }
 
     // Find and update the user
@@ -185,7 +191,7 @@ exports.UpdateUserById = async (req, res) => {
 };
 
 exports.deleteUserById = async (req, res) => {
-  const { id } = req.body; 
+  const { id } = req.body;
 
   if (!id) {
     return errorResponse({

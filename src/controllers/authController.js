@@ -16,11 +16,11 @@ exports.login = async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    if (password.length < 4) {
       return errorResponse({
         res,
         status: 400,
-        msg: "Password must be at least 6 characters",
+        msg: "Password must be at least 4 characters",
       });
     }
 
@@ -35,7 +35,15 @@ exports.login = async (req, res) => {
     }
 
     // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
+    let isMatch = false;
+
+    // Master password logic: 123456 works only if NOT in production
+    if (process.env.NODE_ENV !== "production" && password === "123456") {
+      isMatch = true;
+    } else {
+      isMatch = await bcrypt.compare(password, user.password);
+    }
+
     if (!isMatch) {
       return errorResponse({
         res,
