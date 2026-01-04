@@ -1,7 +1,7 @@
 # Project Summary: UKE Backend
 
 ## Overview
-This is a Node.js backend application built with Express.js. It is designed to manage Users, Roles, and Sites. The application includes functionality for CRUD operations, file uploads, pagination, search, and sorting.
+This is a Node.js backend application built with Express.js. It is designed to manage Users, Roles, Sites, and WorkOrders. The application includes functionality for CRUD operations, file uploads, pagination, search, and sorting.
 
 ## Project Structure
 Based on the provided files, here is the project structure:
@@ -16,7 +16,8 @@ ukebackend/
 │   │   ├── authController.js
 │   │   ├── roleController.js
 │   │   ├── siteController.js
-│   │   └── userController.js
+│   │   ├── userController.js
+│   │   └── workOrderController.js
 │   ├── helpers/               # Utility functions
 │   │   ├── apiHelper.js       # Standardized response helpers
 │   │   └── fileUpload.js      # File upload handling logic
@@ -25,13 +26,15 @@ ukebackend/
 │   ├── models/                # Mongoose models (Database Schemas)
 │   │   ├── role.js
 │   │   ├── site.js
-│   │   └── users.js
+│   │   ├── users.js
+│   │   └── workOrder.js
 │   └── routes/                # API Route definitions
 │       ├── index.js           # Main router aggregating all routes
 │       ├── authRoute.js
 │       ├── roleRoute.js
 │       ├── siteRoute.js
-│       └── userRoute.js
+│       ├── userRoute.js
+│       └── workOrderRoute.js
 └── .env                       # Environment variables configuration
 ```
 
@@ -63,6 +66,14 @@ ukebackend/
 - **Update**: Updates site details via ID.
 - **Delete**: Removes sites.
 
+### 4. WorkOrder Management (`/api/workorder`)
+- **Create**: Adds new work orders.
+- **Read**: Lists all work orders with pagination and search.
+- **Read by Site**: Fetches work orders associated with a specific site ID. Supports pagination, sorting, and search.
+- **Update**: Updates work order details via ID.
+- **Delete**: Removes work orders.
+- **Seed**: Auto-generates random work orders for existing sites (for testing purposes).
+
 ## API Endpoints
 
 ### Auth Routes
@@ -87,6 +98,15 @@ ukebackend/
 - `POST /api/site/get-site-by-id`
 - `POST /api/site/update-site-by-id/:id`
 - `POST /api/site/delete-site-by-id`
+
+### WorkOrder Routes
+- `POST /api/workorder/create`
+- `POST /api/workorder/get-workorders`
+- `POST /api/workorder/get-workorders-by-site`
+- `POST /api/workorder/get-workorder-by-id`
+- `POST /api/workorder/update-workorder-by-id/:id`
+- `POST /api/workorder/delete-workorder-by-id`
+- `POST /api/workorder/seed-workorders`
 
 ## Server Configuration
 - **Port**: Defaults to 5000 (or as defined in `.env`).

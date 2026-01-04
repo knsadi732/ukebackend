@@ -50,11 +50,11 @@ exports.getUsers = async (req, res) => {
     status = "",
     searchText = "",
     sortBy = "updatedAt,-1",
-  } = req.query;
+  } = { ...req.query, ...req.body };
 
   const [field, value] = sortBy.split(",");
 
-  let query = { userType: "testing" };
+  let query = {};
 
   if (searchText)
     query = { ...query, name: { $regex: searchText, $options: "i" } };

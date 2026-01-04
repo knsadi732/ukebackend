@@ -26,11 +26,11 @@ exports.getSites = async (req, res) => {
     status = "",
     searchText = "",
     sortBy = "updatedAt,-1",
-  } = req.query;
+  } = { ...req.query, ...req.body };
 
   const [field, value] = sortBy.split(",");
 
-  let query = { siteType: "testing" };
+  let query = {};
 
   if (searchText)
     query = { ...query, name: { $regex: searchText, $options: "i" } };
@@ -88,8 +88,8 @@ exports.getSiteById = async (req, res) => {
     const site = id
       ? await Site.findOne({ _id: id, siteType: "testing", lean: true }) // Fetch by ID
       : await Site.findOne(query)
-          .sort({ [field]: parseInt(value) })
-          .lean();
+        .sort({ [field]: parseInt(value) })
+        .lean();
 
     if (!site) {
       return errorResponse({
@@ -185,7 +185,7 @@ exports.deleteSiteById = async (req, res) => {
 
     return successResponse({
       res,
-    //   data: deletedSite,
+      //   data: deletedSite,
       msg: "Site deleted successfully",
     });
   } catch (error) {

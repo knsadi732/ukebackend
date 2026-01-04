@@ -4,6 +4,7 @@ const userRoute = require("./userRoute");
 const roleRoute = require("./roleRoute");
 const siteRoute = require("./siteRoute");
 const authRoute = require("./authRoute");
+const workOrderRoute = require("./workOrderRoute");
 // const packageRoute = require("./packageRoute");
 // const bookingRoute = require("./bookingRoute");
 // const dashboardRoute = require("./dashboardRoute");
@@ -17,6 +18,7 @@ router.use("/auth", authRoute);
 router.use("/user",  userRoute);
 router.use("/role",  roleRoute);
 router.use("/site",  siteRoute);
+router.use("/workorder", workOrderRoute);
 // router.use("/package", [auth, isAdmin], packageRoute);
 // router.use("/dashboard", [auth, isAdmin], dashboardRoute);
 
