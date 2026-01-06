@@ -69,9 +69,44 @@ exports.getUsers = async (req, res) => {
       sort: { [field]: parseInt(value) },
     });
 
+
+    const data = {
+                "id": users._id,
+                "name": users.name,
+                "email": users.email,
+                "role": users.role,
+                "phone": users.phone,
+                "address": users.address,                
+                "highest_qualification": users.highest_qualification,
+                "specializations": users.specializations,
+                "experience": users.experience,
+                "nominee_name": users.nominee_name,
+                "bank_name": users.bank_name,
+                "identification_mark": users.identification_mark,
+                "aadhar_no": users.aadhar_no,
+                "nominee_aadhar_no": users.nominee_aadhar_no,
+                "pan_no": users.pan_no,
+                "driving_license_no": users.driving_license_no,
+                "ifsc": users.ifsc,
+                "bank_account_no": users.bank_account_no,
+                "blood_group": users.blood_group,
+                "dob": users.dob,
+                "uan": users.uan,
+                "status": users.status,
+                "esic": users.esic,
+                "aadhar_front_image": users.aadhar_front_image,
+                "aadhar_back_image": users.aadhar_back_image,
+                "pan_image": users.pan_image,
+                "upload_image": users.upload_image,
+                "certificate": users.certificate,
+                "medical": users.medical,
+                "eye_test_medical": users.eye_test_medical,                
+                "driving_license_image": users.driving_license_image,
+    }
+
     return successResponse({
       res,
-      data: users,
+      data: data,
       msg: "Record found successfully",
     });
   } catch (error) {
