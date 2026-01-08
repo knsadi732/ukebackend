@@ -91,8 +91,12 @@ exports.getWorkOrdersBySiteId = async (req, res) => {
         status = "",
         searchText = "",
         sortBy = "updatedAt,-1",
-        siteId,
-    } = { ...req.query, ...req.body };
+        siteId: querySiteId,
+    } = { ...req.query, ...req.body, ...(req.body.formData || {}) };
+    const { site_id } = req.params;
+
+    const siteId = site_id || querySiteId;
+    console.log("Fetching work orders for Site ID:", siteId, req.query, req.body);
 
     if (!siteId) {
         return errorResponse({
