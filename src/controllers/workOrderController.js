@@ -98,7 +98,7 @@ exports.getWorkOrdersBySiteId = async (req, res) => {
         return errorResponse({
             res,
             status: 400,
-            msg: "Site ID is required",
+            msg: `Site ID is required ${siteId}`,
         });
     }
 

@@ -58,6 +58,7 @@ ukebackend/
 ### 2. Role Management (`/api/role`)
 - **Create**: Adds new roles to the system.
 - **Read**: Lists roles with pagination and search filters.
+- **Update**: Updates role details via ID.
 - **Delete**: Removes roles.
 
 ### 3. Site Management (`/api/site`)
@@ -90,6 +91,7 @@ ukebackend/
 - `POST /api/role/create`
 - `POST /api/role/get-roles`
 - `POST /api/role/get-roles-by-id`
+- `POST /api/role/update-role-by-id/:id`
 - `POST /api/role/delete-roles-by-id`
 
 ### Site Routes
