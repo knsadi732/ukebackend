@@ -20,13 +20,13 @@ const schema = new mongoose.Schema(
           `${props.value} is not a valid 10-digit phone number!`,
       },
     },
-    highest_qualification: { type: String, required: true, trim: true },
+    highestQualification: { type: String, required: true, trim: true },
     specializations: { type: String, trim: true },
-    nominee_name: { type: String, required: true, trim: true },
-    bank_name: { type: String, required: true, trim: true },
-    identification_mark: { type: String, required: true, trim: true },
+    nomineeName: { type: String, required: true, trim: true },
+    bankName: { type: String, required: true, trim: true },
+    identificationMark: { type: String, required: true, trim: true },
 
-    aadhar_no: {
+    aadharNo: {
       type: String,
       required: true,
       trim: true,
@@ -39,7 +39,7 @@ const schema = new mongoose.Schema(
           `${props.value} is not a valid 12-digit Aadhar number!`,
       },
     },
-    nominee_aadhar_no: {
+    nomineeAadharNo: {
       type: String,
       required: true,
       trim: true,
@@ -52,7 +52,7 @@ const schema = new mongoose.Schema(
       },
     },
 
-    pan_no: {
+    panNo: {
       type: String,
       required: true,
       trim: true,
@@ -64,7 +64,7 @@ const schema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid PAN number!`,
       },
     },
-    driving_license_no: {
+    drivingLicenseNo: {
       type: String,
       trim: true,
       required: false,
@@ -90,7 +90,7 @@ const schema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid IFSC code!`,
       },
     },
-    bank_account_no: {
+    bankAccountNo: {
       type: String,
       required: true,
       trim: true,
@@ -102,7 +102,7 @@ const schema = new mongoose.Schema(
           `${props.value} is not a valid bank account number!`,
       },
     },
-    blood_group: {
+    bloodGroup: {
       type: String,
       required: true,
       trim: true,
@@ -133,16 +133,21 @@ const schema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid ESIC number!`,
       },
     },
-    aadhar_front_image: { type: String, required: true, trim: true },
-    aadhar_back_image: { type: String, required: true, trim: true },
-    pan_image: { type: String, required: true, trim: true },
-    upload_image: { type: String, required: true, trim: true },
+    aadharFrontImage: { type: String, required: false, trim: true },
+    aadharBackImage: { type: String, required: false, trim: true },
+    panImage: { type: String, required: false, trim: true },
+    uploadImage: { type: String, required: false, trim: true },
     certificate: { type: [String], trim: true, required: false },
-    medical: { type: String, required: true, trim: true },
-    eye_test_medical: { type: String, trim: true },
-    role: { type: String, required: true, trim: true },
+    medical: { type: String, default: "No", trim: true },
+    medicalCertificate: { type: String, trim: true },
+    eyeTest: { type: String, default: "No", trim: true },
+    eyeTestMedical: { type: String, trim: true },
 
-    driving_license_image: {
+    role: [{ type: mongoose.Schema.Types.ObjectId, ref: "role" }],
+    site: [{ type: mongoose.Schema.Types.ObjectId, ref: "site" }],
+    workOrderNo: [{ type: mongoose.Schema.Types.ObjectId, ref: "workOrder" }],
+
+    drivingLicenseImage: {
       type: String,
       trim: true,
       required: false,

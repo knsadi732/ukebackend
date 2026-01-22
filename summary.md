@@ -46,28 +46,44 @@ ukebackend/
   - `cors`: For handling Cross-Origin Resource Sharing.
   - `express-fileupload`: For handling multipart file uploads.
   - `dotenv`: For managing environment variables.
+  - `mongoose-paginate-v2`: For pagination in Mongoose models.
 
 ## Modules & Features
 
 ### 1. User Management (`/api/user`)
 - **Create**: Registers new users. Supports uploading multiple documents (Aadhar, PAN, Certificates, Medical, etc.).
+- **Schema Details**:
+  - **Personal**: Name, Email, Address, Phone (validated 10-digits), Blood Group, Highest Qualification, Specializations, Identification Mark.
+  - **Financial**: Bank Name, Account No (9-18 digits), IFSC (validated).
+  - **Identity**: Aadhar (validated 12-digits), PAN (validated format), Driving License, UAN, ESIC.
+  - **Nominee**: Name, Aadhar.
+  - **Uploads**: Aadhar Front/Back, PAN, User Photo, Certificates, Medical/Eye Test docs.
+  - **Relationships**: Linked to `Role`, `Site`, and `WorkOrder` models (Arrays).
+- **Create**: Registers new users with strict regex validations on identity and financial fields.
 - **Read**: Fetches users with pagination, sorting, and search capabilities. Includes specific fetching by ID.
 - **Update**: Updates user details via ID.
 - **Delete**: Removes a user record.
 
 ### 2. Role Management (`/api/role`)
+- **Schema Details**: `role_name`, `role_shorthand`, `loginType`, `roleType`.
 - **Create**: Adds new roles to the system.
 - **Read**: Lists roles with pagination and search filters.
 - **Update**: Updates role details via ID.
 - **Delete**: Removes roles.
 
 ### 3. Site Management (`/api/site`)
+- **Schema Details**: `site_name`, `site_shorthand`, `loginType`, `siteType`.
 - **Create**: Adds new sites.
 - **Read**: Lists sites with pagination and search filters.
 - **Update**: Updates site details via ID.
 - **Delete**: Removes sites.
 
 ### 4. WorkOrder Management (`/api/workorder`)
+- **Schema Details**:
+  - `workOrderNumber`: Auto-generated (Format: `WO-<Timestamp>-<Random>`).
+  - `siteId`: Reference to Site.
+  - `status`: Defaults to "pending".
+  - `priority`: Defaults to "medium".
 - **Create**: Adds new work orders.
 - **Read**: Lists all work orders with pagination and search.
 - **Read by Site**: Fetches work orders associated with a specific site ID. Supports pagination, sorting, and search.
@@ -112,5 +128,7 @@ ukebackend/
 
 ## Server Configuration
 - **Port**: Defaults to 5000 (or as defined in `.env`).
+- **Database Connection**: Server explicitly waits for DB connection before listening (`await connectDB()`).
 - **Static Files**: Uploaded files are served from `/uploads`.
 - **Logging**: Includes a custom middleware to log incoming requests (`[DEBUG] Incoming Request...`) to the console.
+- **Logging**: Includes a custom middleware to log incoming requests (`[DEBUG] METHOD URL`) to the console.
