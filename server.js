@@ -41,7 +41,7 @@ app.use("/uploads", express.static(uploadPath));
 
 
 // Database connection
-require("./src/config/connection");
+require("./src/config/postgres");
 
 // Route setup
 const rootRouter = require("./src/routes");
