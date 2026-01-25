@@ -1,5 +1,7 @@
 const { Pool } = require("pg");
 
+
+
 const pool = new Pool({
     user: process.env.DB_USER || "postgres",
     host: process.env.DB_HOST || "localhost",
@@ -8,20 +10,21 @@ const pool = new Pool({
     port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
 });
 
+
+console.log("DB_USER:", process.env.DB_USER);
+console.log("DB_HOST:", process.env.DB_HOST);
+console.log("DB_PORT:", process.env.DB_PORT);
+console.log("DB_NAME:", process.env.DB_NAME);
+
+
+
 pool
-    .connect()
-    .then((client) => {
-        return client
-            .query("SELECT NOW()")
-            .then(() => {
-                client.release();
-                console.log("✅ PostgreSQL Connected Successfully");
-            })
-            .catch((err) => {
-                client.release();
-                console.error("❌ Query Error:", err);
-            });
+    .query("SELECT NOW()")
+    .then(() => {
+        console.log("✅ PostgreSQL Connected Successfully");
     })
-    .catch((err) => console.error("❌ DB Connection Error:", err));
+    .catch((err) => {
+        console.error("❌ Query Error:", err);
+    });
 
 module.exports = pool;

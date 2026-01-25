@@ -43,8 +43,11 @@ app.use("/uploads", express.static(uploadPath));
 // Database connection
 require("./src/config/postgres");
 
+
+
 // Route setup
-const rootRouter = require("./src/routes");
+// const rootRouter = require("./src/routes");
+const rootRouter = require("./src/routes/index");
 app.use("/api", rootRouter);
 
 // Default route
