@@ -63,7 +63,7 @@ exports.login = async (req, res) => {
 
     return successResponse({
       res,
-      data: { token, user },
+      data: { token:token, name:user.name,  phone:user.phone, id:user._id , role:user.role, email:user.email },
       msg: "Login successful",
     });
   } catch (error) {
