@@ -1,4 +1,4 @@
-const Site = require("../models/site");
+const pool = require("../config/postgres");
 const { successResponse, errorResponse } = require("../helpers/apiHelper");
 
 exports.create = async (req, res) => {
@@ -20,42 +20,38 @@ exports.create = async (req, res) => {
   }
 };
 exports.getSites = async (req, res) => {
-  const {
-    page = 1,
-    limit = 10,
-    status = "",
-    searchText = "",
-    sortBy = "updatedAt,-1",
-  } = { ...req.query, ...req.body };
-
-  const [field, value] = sortBy.split(",");
-
-  let query = {};
-
-  if (searchText)
-    query = { ...query, name: { $regex: searchText, $options: "i" } };
-
-  if (status !== "") query = { ...query, status };
-
   try {
-    let sites = await Site.paginate(query, {
-      page,
-      limit,
-      lean: true,
-      sort: { [field]: parseInt(value) },
-    });
+    const { searchText = "" } = { ...req.query, ...req.body };
+
+    let where = "WHERE 1=1";
+    let values = [];
+
+    if (searchText) {
+      values.push(`%${searchText}%`);
+      where += ` AND name ILIKE $${values.length}`;
+    }
+
+    const dataRes = await pool.query(
+      `
+      SELECT id, site_name, site_shorthand
+      FROM sites
+      ${where}
+      ORDER BY id DESC
+      `,
+      values
+    );
 
     return successResponse({
       res,
-      data: sites,
-      msg: "Record found successfully",
+      data: dataRes.rows,
     });
   } catch (error) {
+    console.log({ error });
     return errorResponse({
       res,
       error,
-      status: 400,
-      msg: "Invalid data",
+      status: 500,
+      msg: "Server Error",
     });
   }
 };

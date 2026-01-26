@@ -1,10 +1,10 @@
-const Role = require("../models/role");
+const pool = require("../config/postgres");
 const { successResponse, errorResponse } = require("../helpers/apiHelper");
 
 exports.create = async (req, res) => {
   try {
 
-  
+
 
     const role = await new Role({ ...req.body }).save();
 
@@ -24,51 +24,48 @@ exports.create = async (req, res) => {
   }
 };
 exports.getRoles = async (req, res) => {
-  const {
-    page = 1,
-    limit = 10,
-    status = "",
-    searchText = "",
-    sortBy = "updatedAt,-1",
-  } = req.query;
-  const [field, value] = sortBy.split(",");
-
-  let query = { roleType: "testing" };
-
-  if (searchText)
-    query = { ...query, name: { $regex: searchText, $options: "i" } };
-
-  if (status !== "") query = { ...query, status };
-
   try {
-    let roles = await Role.paginate(query, {
-      page,
-      limit,
-      sort: { [field]: parseInt(value) },
-    });
+    const { searchText = "" } = { ...req.query, ...req.body };
 
-  
+    let where = "WHERE 1=1";
+    let values = [];
+
+    if (searchText) {
+      values.push(`%${searchText}%`);
+      where += ` AND name ILIKE $${values.length}`;
+    }
+
+    const dataRes = await pool.query(
+      `
+      SELECT id, role_name, role_shorthand
+      FROM roles
+      ${where}
+      ORDER BY id DESC
+      `,
+      values
+    );
 
     return successResponse({
       res,
-      data: roles,
-      msg: "Record found successfully",
+      data: dataRes.rows,
     });
   } catch (error) {
+    console.log({ error });
     return errorResponse({
       res,
       error,
-      status: 400,
-      msg: "Invalid data",
+      status: 500,
+      msg: "Server Error",
     });
   }
 };
+
 
 exports.getRolesById = async (req, res) => {
   const {
     status = "",
     searchText = "",
-    id = "", // Extract `id` from query parameters
+    id = "",
     sortBy = "updatedAt,-1",
   } = req.query;
 

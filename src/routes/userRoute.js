@@ -11,8 +11,8 @@ const {
 
 app.post("/create", create);
 app.post("/get-users", getUsers);
-app.post("/get-user-by-id", getUserById);
+app.post("/get-user-by-id/:id", getUserById);
 app.post("/update-user-by-id/:id", UpdateUserById);
-app.post("/delete-user-by-id", deleteUserById);
+app.post("/delete-user-by-id/:id", deleteUserById);
 
 module.exports = app;
